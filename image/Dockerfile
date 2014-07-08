@@ -6,6 +6,7 @@ ENV HOME /root
 # Add redis repo
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 5862E31D
 RUN echo deb http://ppa.launchpad.net/rwky/redis/ubuntu trusty main > /etc/apt/sources.list.d/redis.list
+RUN apt-get update
 
 # Install redis
 RUN apt-get install -y redis-server libhiredis-dev
@@ -17,5 +18,11 @@ ADD support/config/redis.conf /etc/redis/redis.conf
 RUN apt-get clean
 RUN rm -rf /tmp/* /var/tmp/*
 
+# Describe runtime environment
+VOLUME ["/var/lib/redis"]
+WORKDIR /var/lib/redis/
+
 # Use playlist/base's init script
 CMD ["/sbin/my_init"]
+
+EXPOSE 6379
