@@ -1,7 +1,7 @@
 all: build
 
 build:
-	docker build -t playlist/redis image
+	docker build -t playlist/redis .
 
 shell:
 	docker run -t -i playlist/redis /bin/bash
