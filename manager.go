@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strings"
 	"sync"
 )
@@ -11,7 +12,7 @@ import (
 type Manager struct {
 	outletFactory *OutletFactory
 
-	teardown, teardownNow Barrier
+	teardown, teardownNow Barrier // signal shutting down
 
 	wg sync.WaitGroup
 }
@@ -25,7 +26,7 @@ func (m *Manager) monitorInterrupt() {
 	for sig := range handler {
 		switch sig {
 		case os.Interrupt:
-			fmt.Println("ctrl-c detected")
+			fmt.Println("      | ctrl-c detected")
 
 			m.teardown.Fall()
 			if !first {
@@ -36,14 +37,10 @@ func (m *Manager) monitorInterrupt() {
 	}
 }
 
-func (m *Manager) startProcess(idx int, name string, args []string) {
-	workDir, err := os.Getwd()
-	if err != nil {
-		handleError(err)
-	}
-
+func (m *Manager) startProcess(idx int, name string, args []string, of *OutletFactory) {
 	const interactive = false
-	ps := NewProcess(workDir, strings.Join(args, " "), interactive)
+	workDir := filepath.Dir(".")
+	ps := NewProcess(workDir, strings.Join(args, " "))
 
 	ps.Stdin = nil
 
@@ -58,15 +55,15 @@ func (m *Manager) startProcess(idx int, name string, args []string) {
 
 	pipeWait := new(sync.WaitGroup)
 	pipeWait.Add(2)
-	go m.outletFactory.LineReader(pipeWait, name, idx, stdout, false)
-	go m.outletFactory.LineReader(pipeWait, name, idx, stderr, true)
+	go of.LineReader(pipeWait, name, idx, stdout, false)
+	go of.LineReader(pipeWait, name, idx, stderr, true)
 
-	finished := make(chan struct{})
+	finished := make(chan struct{}) // closed on process exit
 
 	err = ps.Start()
 	if err != nil {
 		m.teardown.Fall()
-		m.outletFactory.SystemOutput(fmt.Sprint("Failed to start ", name, ": ", err))
+		of.SystemOutput(fmt.Sprint("Failed to start ", name, ": ", err))
 		return
 	}
 
@@ -87,24 +84,28 @@ func (m *Manager) startProcess(idx int, name string, args []string) {
 		defer m.teardown.Fall()
 
 		select {
+		case <-finished:
+			return
+
 		case <-m.teardown.Barrier():
+			// Manager tearing down
+
 			if !osHaveSigTerm {
-				m.outletFactory.SystemOutput(fmt.Sprintf("Killing %s", name))
+				of.SystemOutput(fmt.Sprintf("Killing %s", name))
 				ps.Process.Kill()
 				return
 			}
 
-			m.outletFactory.SystemOutput(fmt.Sprintf("sending SIGTERM to %s", name))
+			of.SystemOutput(fmt.Sprintf("sending SIGTERM to %s", name))
 			ps.SendSigTerm()
 
 			// Give the process a chance to exit, otherwise kill it.
 			select {
 			case <-m.teardownNow.Barrier():
-				m.outletFactory.SystemOutput(fmt.Sprintf("Killing %s", name))
+				of.SystemOutput(fmt.Sprintf("Killing %s", name))
 				ps.SendSigKill()
 			case <-finished:
 			}
 		}
 	}()
-
 }

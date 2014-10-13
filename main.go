@@ -13,9 +13,9 @@ import (
 
 const shutdownGraceTime = 20 * time.Second
 
-const sentinelCfgTmpl = `port %i
+const sentinelCfgTmpl = `port %d
 sentinel announce-ip %s
-sentinel monitor local %s %i 2
+sentinel monitor local %s %d 2
 sentinel down-after-milliseconds local 60000
 sentinel failover-timeout local 180000
 sentinel parallel-syncs local 1
@@ -37,14 +37,8 @@ var (
 	e *etcd.Client
 )
 
-func handleError(err error) {
-	if err != nil {
-		fmt.Println("ERROR:", err)
-		os.Exit(1)
-	}
-}
-
 func main() {
+	// Parse flags
 	flag.IntVar(&redisPort, "redis-port", 6379, "port redis is running on")
 	flag.StringVar(&redisConfig, "redis-config", "/etc/redis/redis-server.conf", "path to redis config")
 
@@ -59,22 +53,28 @@ func main() {
 
 	flag.Parse()
 
-	e = etcd.NewClient([]string{etcdHost})
+	// Set up manager
+	of := NewOutletFactory()
+	of.Padding = 14
 
+	// Configure etcd
+	e = etcd.NewClient([]string{etcdHost})
 	e.CreateDir("/redis", 0)
 	e.CreateDir("/redis/cluster", 0)
 	e.CreateDir("/redis/cluster/nodes", 0)
 
+	// Read hostname
 	hostname, err := os.Hostname()
 	handleError(err)
 
+	// Find or elect master
 	master := ""
-
 	r, err := e.Get("/redis/cluster/master", false, false)
 	if err != nil || r.Node == nil {
+		of.SystemOutput("There is no master - holding an election...")
 		_, err := e.Create("/redis/cluster/election", hostname, 20)
 		if err != nil {
-			// lost election, wait for master
+			of.SystemOutput("I lost the election - waiting for the master")
 			for {
 				r, err := e.Get("/redis/cluster/master", false, false)
 				if err == nil && r.Node != nil && r.Node.Value != "" {
@@ -86,18 +86,13 @@ func main() {
 				time.Sleep(1 * time.Second)
 			}
 		} else {
-			// won election
+			of.SystemOutput("I won the election!")
 		}
 	} else {
 		master = r.Node.Value
+		of.SystemOutput("There is already a cluster master")
 	}
 
-	run(master)
-}
-
-func run(master string) {
-	of := NewOutletFactory()
-	of.Padding = 14
 	m := &Manager{
 		outletFactory: of,
 	}
@@ -107,22 +102,27 @@ func run(master string) {
 	m.teardown.FallHook = func() {
 		go func() {
 			time.Sleep(shutdownGraceTime)
-			fmt.Println("Grace time expired")
+			of.SystemOutput("Grace time expired")
 			m.teardownNow.Fall()
 		}()
 	}
 
+	// Run redis as master or slave
 	if master == "" {
-		m.startProcess(1, "redis-server", []string{"redis-server", redisConfig})
+		of.SystemOutput("Starting redis in master mode")
+		m.startProcess(1, "redis-server", []string{"redis-server", redisConfig}, of)
 	} else {
-		m.startProcess(1, "redis-server", []string{"redis-server", redisConfig, "--slaveof", master})
+		of.SystemOutput("Starting redis in slave mode")
+		m.startProcess(1, "redis-server", []string{"redis-server", redisConfig, "--slaveof", master}, of)
 	}
 
-	// wait for redis to come alive
-	var err error
+	// Wait for redis to come alive
+	err = nil
 	var c net.Conn
+	host := fmt.Sprintf("%s:%d", publishHost, redisPort)
 	for {
-		c, err = net.Dial("tcp", fmt.Sprintf("%s:6379", publishHost))
+		of.SystemOutput("Looking for redis server on " + host)
+		c, err = net.Dial("tcp", host)
 		if err == nil {
 			break
 		}
@@ -130,16 +130,18 @@ func run(master string) {
 	}
 	c.Close()
 
+	// Run redis sentinel
+	of.SystemOutput("Starting redis sentinel")
 	ioutil.WriteFile(sentinelConfig, []byte(fmt.Sprintf(sentinelCfgTmpl, sentinelPort, publishHost, publishHost, publishPort)), 0644)
-	m.startProcess(2, "redis-sentinel", []string{"redis-sentinel", sentinelConfig})
+	m.startProcess(2, "redis-sentinel", []string{"redis-sentinel", sentinelConfig}, of)
 
+	// Update etcd
 	go func() {
 		for {
 			if master == "" {
 				e.Set("/redis/cluster/master", fmt.Sprintf("%s 6379", publishHost), uint64(etcdTTL))
 			}
 
-			hostname, _ := os.Hostname()
 			if hostname != "" {
 				e.Set("/redis/cluster/nodes/"+hostname, fmt.Sprintf("%s 6379", publishHost), uint64(etcdTTL))
 			}
@@ -148,7 +150,7 @@ func run(master string) {
 		}
 	}()
 
+	// Wait
 	<-m.teardown.Barrier()
-
 	m.wg.Wait()
 }

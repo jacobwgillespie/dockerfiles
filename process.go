@@ -10,11 +10,8 @@ import (
 
 const osHaveSigTerm = true
 
-func ShellInvocationCommand(interactive bool, root, command string) []string {
+func ShellInvocationCommand(root, command string) []string {
 	shellArgument := "-c"
-	if interactive {
-		shellArgument = "-ic"
-	}
 	profile := filepath.Join(root, ".profile")
 	shellCommand := fmt.Sprintf("source \"%s\" 2>/dev/null; %s", profile, command)
 	return []string{"/bin/bash", shellArgument, shellCommand}
@@ -22,21 +19,21 @@ func ShellInvocationCommand(interactive bool, root, command string) []string {
 }
 
 type Process struct {
-	Command     string
-	Interactive bool
+	Command string
 
 	*exec.Cmd
 }
 
-func NewProcess(workdir, command string, interactive bool) (p *Process) {
-	argv := ShellInvocationCommand(interactive, workdir, command)
+func NewProcess(workdir, command string) (p *Process) {
+	argv := ShellInvocationCommand(workdir, command)
 	return &Process{
-		command, interactive, exec.Command(argv[0], argv[1:]...),
+		command, exec.Command(argv[0], argv[1:]...),
 	}
 }
 
 func (p *Process) Start() error {
-	p.PlatformSpecificInit()
+	p.SysProcAttr = &syscall.SysProcAttr{}
+	p.SysProcAttr.Setsid = true
 	return p.Cmd.Start()
 }
 
@@ -46,14 +43,6 @@ func (p *Process) Signal(signal syscall.Signal) error {
 		err = group.Signal(signal)
 	}
 	return err
-}
-
-func (p *Process) PlatformSpecificInit() {
-	if !p.Interactive {
-		p.SysProcAttr = &syscall.SysProcAttr{}
-		p.SysProcAttr.Setsid = true
-	}
-	return
 }
 
 func (p *Process) SendSigTerm() {
