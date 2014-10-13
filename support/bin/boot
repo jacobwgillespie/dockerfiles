@@ -45,7 +45,7 @@ cluster_members
 
 echo Starting redis in HA mode
 
-if [[ -z $CLUSTER_MASTER && ! $CLUSTER_MASTER -eq "no" ]]; then
+if [[ -z $CLUSTER_MASTER || $CLUSTER_MASTER -eq "no" ]]; then
   # Perform Election
   echo "==> There is no current master - performing election..."
   etcdctl $ETCD_OPTIONS ls $ETCD_PATH/election >/dev/null 2>&1 || etcdctl $ETCD_OPTIONS mkdir $ETCD_PATH/election >/dev/null 2>&1
