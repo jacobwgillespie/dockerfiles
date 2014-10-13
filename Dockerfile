@@ -34,4 +34,4 @@ RUN chmod +x /app/bin/*
 CMD ["/app/bin/boot"]
 
 # Expose ports.
-EXPOSE 6379
+EXPOSE 6379 26379
