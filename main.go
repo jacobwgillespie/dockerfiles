@@ -59,9 +59,18 @@ func main() {
 
 	// Configure etcd
 	e = etcd.NewClient([]string{etcdHost})
-	e.CreateDir("/redis", 0)
-	e.CreateDir("/redis/cluster", 0)
-	e.CreateDir("/redis/cluster/nodes", 0)
+	_, err := e.CreateDir("/redis", 0)
+	if err != nil {
+		of.ErrorOutput(err.Error())
+	}
+	_, err = e.CreateDir("/redis/cluster", 0)
+	if err != nil {
+		of.ErrorOutput(err.Error())
+	}
+	_, err = e.CreateDir("/redis/cluster/nodes", 0)
+	if err != nil {
+		of.ErrorOutput(err.Error())
+	}
 
 	// Read hostname
 	hostname, err := os.Hostname()
@@ -70,6 +79,9 @@ func main() {
 	// Find or elect master
 	master := ""
 	r, err := e.Get("/redis/cluster/master", false, false)
+	if err != nil {
+		of.ErrorOutput(err.Error())
+	}
 	if err != nil || r.Node == nil {
 		of.SystemOutput("There is no master - holding an election...")
 		_, err := e.Create("/redis/cluster/election", hostname, 20)
