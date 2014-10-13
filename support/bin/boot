@@ -89,12 +89,6 @@ echo "==> Redis running..."
 
 tail -f /var/log/redis.log &
 
-redis-sentinel /app/sentinel.conf &
-SERVICE_PID=$!
-echo $SERVICE_PID > /app/sentinel.pid
-
-echo "==> Redis Sentinel running..."
-
 # publish the service to etcd using the injected HOST and PORT
 if [[ ! -z $PUBLISH ]]; then
 
@@ -102,6 +96,12 @@ if [[ ! -z $PUBLISH ]]; then
 
   # wait for the service to become available on PUBLISH port
   sleep 1 && while [[ -z $(netstat -lnt | awk "\$6 == \"LISTEN\" && \$4 ~ \".$PUBLISH\" && \$1 ~ \"$PROTO.?\"") ]] ; do sleep 1; done
+
+  # start redis sentinel
+  redis-sentinel /app/sentinel.conf &
+  SERVICE_PID=$!
+  echo $SERVICE_PID > /app/sentinel.pid
+  echo "==> Redis Sentinel running..."
 
   # while the port is listening, publish to etcd
   while [[ ! -z $(netstat -lnt | awk "\$6 == \"LISTEN\" && \$4 ~ \".$PUBLISH\" && \$1 ~ \"$PROTO.?\"") ]] ; do
