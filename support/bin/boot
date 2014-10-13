@@ -57,7 +57,7 @@ if [[ -z $CLUSTER_MASTER || $CLUSTER_MASTER -eq "no" ]]; then
     redis-server $DB_OPTIONS &
   else
     echo -n "-----> I lost election.  Waiting for the master."
-    until [[ ! -z $CLUSTER_MASTER ]]; do
+    until [[ ! -z $CLUSTER_MASTER && ! $CLUSTER_MASTER -eq "no" ]]; do
       cluster_master
       echo -n "."
       sleep 10
