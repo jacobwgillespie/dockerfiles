@@ -1,4 +1,4 @@
-FROM playlist/ubuntu
+FROM playlist/golang
 MAINTAINER Jacob Gillespie <jacob@playlist.com>
 
 # Install
@@ -18,20 +18,12 @@ RUN \
   sed -i 's/^\(dir .*\)$/# \1\ndir \/data/' /etc/redis/redis.conf && \
   sed -i 's/^\(logfile .*\)$/# \1/' /etc/redis/redis.conf
 
-# Download latest etcdctl
-ADD https://s3-us-west-2.amazonaws.com/opdemand/etcdctl-v0.4.5 /usr/local/bin/etcdctl
-RUN chmod +x /usr/local/bin/etcdctl
+RUN mkdir -p /go/src/app
+WORKDIR /go/src/app
+COPY . /go/src/app
+RUN go-wrapper download
+RUN go-wrapper install
 
-# Define mountable directories
 VOLUME ["/data"]
-
-# Add helpers
-ADD ./support /app
-WORKDIR /app
-RUN chmod +x /app/bin/*
-
-# Define default command
-CMD ["/app/bin/boot"]
-
-# Expose ports.
+ENTRYPOINT ["go-wrapper", "run"]
 EXPOSE 6379 26379
