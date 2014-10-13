@@ -58,6 +58,7 @@ func main() {
 	of.Padding = 14
 
 	// Configure etcd
+	of.SystemOutput("Connecting to etcd at " + etcdHost)
 	e = etcd.NewClient([]string{etcdHost})
 	_, err := e.CreateDir("/redis", 0)
 	if err != nil {
