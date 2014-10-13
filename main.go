@@ -90,11 +90,11 @@ func main() {
 			for {
 				r, err := e.Get("/redis/cluster/master", false, false)
 				if err == nil && r.Node != nil && r.Node.Value != "" {
-					fmt.Print("\n")
 					master = r.Node.Value
+					of.SystemOutput("Master ready!")
 					break
 				}
-				fmt.Print(".")
+				of.SystemOutput("Waiting for the master...")
 				time.Sleep(1 * time.Second)
 			}
 		} else {
