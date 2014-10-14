@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"os"
 	"sync"
 
 	"github.com/daviddengcn/go-colortext"
@@ -46,7 +45,7 @@ func (of *OutletFactory) SystemOutput(str string) {
 
 func (of *OutletFactory) ErrorOutput(str string) {
 	fmt.Printf("ERROR: %s\n", str)
-	os.Exit(1)
+	//os.Exit(1)
 }
 
 // Write out a single coloured line
