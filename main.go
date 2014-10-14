@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/coreos/go-etcd/etcd"
@@ -63,6 +64,9 @@ func main() {
 	_, err := e.CreateDir("/redis", 0)
 	if err != nil {
 		of.ErrorOutput(err.Error())
+		if strings.Contains(err.Error(), "All the given peers are not reachable") {
+			os.Exit(1)
+		}
 	}
 	_, err = e.CreateDir("/redis/cluster", 0)
 	if err != nil {
