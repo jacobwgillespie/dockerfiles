@@ -41,7 +41,7 @@ var (
 func main() {
 	// Parse flags
 	flag.IntVar(&redisPort, "redis-port", 6379, "port redis is running on")
-	flag.StringVar(&redisConfig, "redis-config", "/etc/redis/redis-server.conf", "path to redis config")
+	flag.StringVar(&redisConfig, "redis-config", "/etc/redis/redis.conf", "path to redis config")
 
 	flag.IntVar(&sentinelPort, "sentinel-port", 26379, "port sentinel is running on")
 	flag.StringVar(&sentinelConfig, "sentinel-config", "/etc/redis/sentinel.conf", "path to sentinel config")
