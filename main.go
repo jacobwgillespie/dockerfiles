@@ -48,7 +48,7 @@ func main() {
 	flag.StringVar(&sentinelConfig, "sentinel-config", "/etc/redis/sentinel.conf", "path to sentinel config")
 
 	flag.StringVar(&publishHost, "publish-host", "127.0.0.1", "the host to publish on")
-	flag.IntVar(&publishPort, "publish-port", 6370, "the port to publish on")
+	flag.IntVar(&publishPort, "publish-port", 6379, "the port to publish on")
 
 	flag.StringVar(&etcdHost, "etcd-host", "http://localhost:4001", "the hostname of the etcd node")
 	flag.IntVar(&etcdTTL, "etcd-ttl", 10, "etcd ttl in seconds")
