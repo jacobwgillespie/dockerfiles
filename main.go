@@ -17,10 +17,10 @@ const shutdownGraceTime = 20 * time.Second
 
 const sentinelCfgTmpl = `port %d
 sentinel announce-ip %s
-sentinel monitor local %s %d 2
-sentinel down-after-milliseconds local 60000
-sentinel failover-timeout local 180000
-sentinel parallel-syncs local 1
+sentinel monitor master %s %d 2
+sentinel down-after-milliseconds master 60000
+sentinel failover-timeout master 180000
+sentinel parallel-syncs master 1
 `
 
 var (
