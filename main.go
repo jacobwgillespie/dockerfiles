@@ -156,7 +156,7 @@ func main() {
 		parts := strings.Split(master, " ")
 		host := parts[0]
 		port, _ := strconv.ParseInt(parts[1], 10, 0)
-		ioutil.WriteFile(sentinelConfig, []byte(fmt.Sprintf(sentinelCfgTmpl, sentinelPort, host, host, port)), 0644)
+		ioutil.WriteFile(sentinelConfig, []byte(fmt.Sprintf(sentinelCfgTmpl, sentinelPort, publishHost, host, port)), 0644)
 	}
 	m.startProcess(2, "redis-sentinel", []string{"redis-sentinel", sentinelConfig}, of)
 
