@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -149,18 +150,25 @@ func main() {
 
 	// Run redis sentinel
 	of.SystemOutput("Starting redis sentinel")
-	ioutil.WriteFile(sentinelConfig, []byte(fmt.Sprintf(sentinelCfgTmpl, sentinelPort, publishHost, publishHost, publishPort)), 0644)
+	if master == "" {
+		ioutil.WriteFile(sentinelConfig, []byte(fmt.Sprintf(sentinelCfgTmpl, sentinelPort, publishHost, publishHost, publishPort)), 0644)
+	} else {
+		parts := strings.Split(master, " ")
+		host := parts[0]
+		port, _ := strconv.ParseInt(parts[1], 10, 0)
+		ioutil.WriteFile(sentinelConfig, []byte(fmt.Sprintf(sentinelCfgTmpl, sentinelPort, host, host, port)), 0644)
+	}
 	m.startProcess(2, "redis-sentinel", []string{"redis-sentinel", sentinelConfig}, of)
 
 	// Update etcd
 	go func() {
 		for {
 			if master == "" {
-				e.Set("/redis/cluster/master", fmt.Sprintf("%s 6379", publishHost), uint64(etcdTTL))
+				e.Set("/redis/cluster/master", fmt.Sprintf("%s %d", publishHost, publishPort), uint64(etcdTTL))
 			}
 
 			if hostname != "" {
-				e.Set("/redis/cluster/nodes/"+hostname, fmt.Sprintf("%s 6379", publishHost), uint64(etcdTTL))
+				e.Set("/redis/cluster/nodes/"+hostname, fmt.Sprintf("%s %d", publishPort), uint64(etcdTTL))
 			}
 
 			time.Sleep(time.Duration(etcdTTL/2) * time.Second)
