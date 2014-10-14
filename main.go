@@ -89,7 +89,7 @@ func main() {
 	}
 	if err != nil || r.Node == nil {
 		of.SystemOutput("There is no master - holding an election...")
-		_, err := e.Create("/redis/cluster/election", hostname, etcdTTL)
+		_, err := e.Create("/redis/cluster/election", hostname, uint64(etcdTTL))
 		if err != nil {
 			of.SystemOutput("I lost the election - waiting for the master")
 			for {
