@@ -1,5 +1,12 @@
-FROM playlist/golang
-MAINTAINER Jacob Gillespie <jacob@playlist.com>
+FROM golang:1.6
+MAINTAINER Jacob Gillespie <jacobwgillespie@gmail.com>
+
+RUN \
+  apt-get update -y && \
+  apt-get install --no-install-recommends -y curl build-essential git bzr \
+    ca-certificates mercurial && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*
 
 # Install
 RUN \
