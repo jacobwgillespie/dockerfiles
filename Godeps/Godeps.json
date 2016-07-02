@@ -1,5 +1,5 @@
 {
-	"ImportPath": "github.com/playlist-docker/redis",
+	"ImportPath": "github.com/jacobwgillespie/docker-redis",
 	"GoVersion": "go1.3.3",
 	"Deps": [
 		{

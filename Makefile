@@ -1,10 +1,10 @@
 all: build
 
 build:
-	docker build -t playlist/redis .
+	docker build -t jacobwgillespie/redis .
 
 shell:
-	docker run -t -i playlist/redis /bin/bash
+	docker run -t -i jacobwgillespie/redis /bin/bash
 
 clean:
-	docker rmi playlist/redis
+	docker rmi jacobwgillespie/redis
