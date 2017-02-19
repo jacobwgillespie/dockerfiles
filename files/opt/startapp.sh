@@ -14,6 +14,10 @@ done
 
 mkdir -p /root/.config/qBittorrent
 
-qbittorrent \
-   > /root/.config/qBittorrent/desktop_output.log \
-  2> /root/.config/qBittorrent/desktop_error.log
+killall qbittorrent
+
+while true; do
+  qbittorrent \
+     > /root/.config/qBittorrent/desktop_output.log \
+    2> /root/.config/qBittorrent/desktop_error.log
+done

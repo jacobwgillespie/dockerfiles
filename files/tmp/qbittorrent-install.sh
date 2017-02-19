@@ -3,7 +3,7 @@
 add-apt-repository -y ppa:qbittorrent-team/qbittorrent-stable
 apt-get update
 
-apt-get install -qy --force-yes qbittorrent
+apt-get install -qy qbittorrent
 
 # Add service to init
 cat <<'EOT' > /etc/init.d/qbittorrent

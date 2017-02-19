@@ -28,7 +28,7 @@ EOT
 apt-get update -qq
 
 # Install window manager and x-server
-apt-get install -qy --force-yes --no-install-recommends \
+apt-get install -qy --no-install-recommends \
                 x11-xserver-utils \
                 openbox \
                 xfonts-base \
