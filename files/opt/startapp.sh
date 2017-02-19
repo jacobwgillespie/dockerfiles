@@ -12,6 +12,8 @@ until [ "$(/etc/init.d/qbittorrent status)" == "running" ]; do
   fi
 done
 
+mkdir -p /root/.config/qBittorrent
+
 qbittorrent \
    > /root/.config/qBittorrent/desktop_output.log \
   2> /root/.config/qBittorrent/desktop_error.log
