@@ -8,7 +8,7 @@ exec /usr/bin/Xvnc :1 \
                    -depth 24 \
                    -rfbwait 30000 \
                    -${VNC_SECURITY} \
-                   -rfbport 5900 \
+                   -rfbport ${VNC_PORT} \
                    -bs \
                    -ac \
                    -pn \
