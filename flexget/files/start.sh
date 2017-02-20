@@ -17,4 +17,4 @@ cd /config
 
 rm -f /config/.config-lock
 
-su - abc -s/bin/bash -c "flexget daemon start"
+su - abc -s/bin/bash -c "env LANG=en_US.UTF-8 LANGUAGE=en LC_CTYPE=en_US.UTF-8 flexget daemon start"
