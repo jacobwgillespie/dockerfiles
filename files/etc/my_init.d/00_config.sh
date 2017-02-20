@@ -15,6 +15,7 @@ PGID=${PGID:-911}
 groupmod -o -g "$PGID" abc
 usermod -o -u "$PUID" abc
 
-chown abc:abc /app
-chown abc:abc /config
-chown abc:abc /defaults
+chown -R abc:abc /app
+chown -R abc:abc /config
+
+echo "abc user: UID ${PUID} GID ${PGID}"

@@ -1,12 +1,6 @@
 #!/bin/bash
 
 export DEBIAN_FRONTEND="noninteractive"
-mkdir -p /nobody
-usermod -u 99 nobody
-usermod -g 100 nobody
-usermod -m -d /nobody nobody
-usermod -s /bin/bash nobody
-usermod -a -G adm,sudo nobody
 
 # Create abc user
 groupmod -g 1000 users
