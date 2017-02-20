@@ -10,7 +10,7 @@ $ docker create \
   --net=host \
   -e PUID=<UID> -e PGID=<GID> \
   -e TZ=<timezone> \
-  -v </path/to/qbittorrent/config>:/root/.config/qBittorrent \
+  -v </path/to/qbittorrent/config>:/config \
   jacobwgillespie/qbittorrent-vnc
 
 ```
@@ -32,4 +32,4 @@ The VNC server is exposed on port 5900, however you may wish to use `host` netwo
 
 ### Volumes
 
-To persist the qBittorrent configuration across container restarts, mount a volume to `/root/.config/qBittorrent`.
+To persist the qBittorrent configuration across container restarts, mount a volume to `/config`.
