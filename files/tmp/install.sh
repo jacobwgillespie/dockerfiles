@@ -8,6 +8,14 @@ usermod -m -d /nobody nobody
 usermod -s /bin/bash nobody
 usermod -a -G adm,sudo nobody
 
+# Create abc user
+groupmod -g 1000 users
+useradd -u 911 -U -d /config -s /bin/false abc
+usermod -G users abc
+
+# Make our folders
+mkdir -p /app /config
+
 # Disable SSH
 rm -rf /etc/service/sshd /etc/service/cron /etc/my_init.d/00_regen_ssh_host_keys.sh
 
@@ -46,7 +54,6 @@ apt-get install -qy --no-install-recommends \
 # Services
 
 chmod -R +x /etc/service/ /etc/my_init.d/ /opt/startapp.sh /opt/stopapp.sh
-chown -R nobody:users /nobody
 chmod 777 /tmp
 
 # Cleanup

@@ -1,17 +1,20 @@
 #!/bin/bash
 
-# Fix the timezone
+# Configure the timezone
+
 if [[ $(cat /etc/timezone) != $TZ ]] ; then
   ln -sf "/usr/share/zoneinfo/$TZ" /etc/localtime
   dpkg-reconfigure -f noninteractive tzdata
 fi
 
-# Reconfigure user ID/GID if necessary
-mkdir -p /nobody
-USERID=${PUID:-99}
-GROUPID=${PGID:-100}
-groupmod -g $GROUPID users
-usermod -u $USERID nobody
-usermod -g $GROUPID nobody
-usermod -d /nobody nobody
-chown -R nobody:users /nobody/
+# Set up permissions
+
+PUID=${PUID:-911}
+PGID=${PGID:-911}
+
+groupmod -o -g "$PGID" abc
+usermod -o -u "$PUID" abc
+
+chown abc:abc /app
+chown abc:abc /config
+chown abc:abc /defaults
