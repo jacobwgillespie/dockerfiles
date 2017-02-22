@@ -11,6 +11,7 @@ RUN \
   apt-get install -qy --no-install-recommends \
     libfuse2 \
     openbox \
+    python-xdg \
     vnc4server \
     x11-xserver-utils \
     xfonts-100dpi \
