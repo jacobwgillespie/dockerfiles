@@ -20,7 +20,7 @@ RUN \
   # Add default directories
   mkdir -p /app /config /log && \
 
-  # Add default user
+  # Add abc user
   groupmod -g 1000 users && \
   useradd -u 911 -U -d /config -s /bin/bash abc && \
   usermod -G users abc && \
@@ -30,6 +30,6 @@ RUN \
   apt-get clean -y && \
   rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/* /var/cache/*
 
-COPY chaperone.conf /etc/chaperone.d/chaperone.conf
+ADD /files/ /
 
 ENTRYPOINT ["/usr/local/bin/chaperone"]
