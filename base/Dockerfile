@@ -1,4 +1,4 @@
-FROM debian:8
+FROM ubuntu:16.04
 
 ENV \
   DEBIAN_FRONTEND="noninteractive" \
@@ -11,9 +11,11 @@ ENV \
 RUN \
   # Install dependencies
   apt-get update -qq && \
-  apt-get install -qy --no-install-recommends python3-pip curl wget && \
+  apt-get install -qy --no-install-recommends \
+    unzip python3-pip python3-setuptools curl wget && \
 
   # Install process manager
+  pip3 install wheel && \
   pip3 install chaperone && \
   mkdir -p /etc/chaperone.d && \
 
@@ -28,7 +30,7 @@ RUN \
   # Cleanup
   apt-get autoremove -y && \
   apt-get clean -y && \
-  rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/* /var/cache/*
+  rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/* /var/cache/* /root/.cache/*
 
 ADD /files/ /
 
