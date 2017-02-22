@@ -1,4 +1,4 @@
-FROM base
+FROM jacobwgillespie/base
 
 RUN \
   # Install dependencies
