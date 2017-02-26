@@ -25,10 +25,6 @@ RUN \
   mkdir -p /opt/vncpasswd && \
   curl -L https://github.com/trinitronx/vncpasswd.py/archive/master.tar.gz | tar -zx --strip=1 -C /opt/vncpasswd && \
 
-  # Install noVNC
-  mkdir -p /opt/novnc && \
-  curl -L https://github.com/novnc/noVNC/archive/v0.6.2.tar.gz | tar -zx --strip=1 -C /opt/novnc && \
-
   # Cleanup
   apt-get autoremove -y && \
   apt-get clean -y && \
