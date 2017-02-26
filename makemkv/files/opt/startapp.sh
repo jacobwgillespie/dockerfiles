@@ -1,4 +1,4 @@
 umask 0000
 while true; do
-  /usr/bin/makemkv
+  HOME=/config /usr/bin/makemkv
 done

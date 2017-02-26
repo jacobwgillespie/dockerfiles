@@ -49,3 +49,5 @@ RUN \
 ADD /files/ /
 
 ENV APP_NAME=MakeMKV
+
+VOLUME /config
