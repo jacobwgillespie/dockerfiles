@@ -12,7 +12,7 @@ RUN \
   # Install dependencies
   apt-get update -qq && \
   apt-get install -qy --no-install-recommends \
-    unzip python3-pip python3-setuptools curl wget && \
+    unzip python3-pip python3-setuptools curl wget less git && \
 
   # Install process manager
   pip3 install wheel && \
