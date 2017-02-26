@@ -6,10 +6,7 @@ RUN \
   # Install window manager and x-server
   apt-get install -qy --no-install-recommends \
     libfuse2 \
-    net-tools \
     openbox \
-    python \
-    python-numpy \
     python-xdg \
     x11-xserver-utils \
     xbase-clients \
