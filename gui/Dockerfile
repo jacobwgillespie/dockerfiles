@@ -1,65 +1,39 @@
 FROM jacobwgillespie/base
 
 RUN \
-  # Install dependencies
-  echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee /etc/apt/sources.list.d/webupd8team-java.list && \
-  echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list && \
-  apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886 && \
   apt-get update -qq && \
 
-  # Install window manager, X server, and Xrdp
+  # Install window manager and x-server
   apt-get install -qy --no-install-recommends \
     libfuse2 \
+    net-tools \
     openbox \
+    python \
+    python-numpy \
     python-xdg \
-    vnc4server \
     x11-xserver-utils \
+    xbase-clients \
     xfonts-100dpi \
     xfonts-75dpi \
     xfonts-base \
-    xrdp && \
+    xkb-data && \
 
-  # Install Java
-  echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
-  apt-get install -qy oracle-java8-installer && \
+  # Install TigerVNC
+  curl -L https://dl.bintray.com/tigervnc/stable/tigervnc-1.7.1.x86_64.tar.gz | tar -xz --strip=1 -C / && \
 
-  # Install Guacamole (web UI)
-  apt-get install -qy --no-install-recommends \
-    build-essential \
-    libcairo2-dev \
-    libfreerdp-dev \
-    libjpeg62-turbo-dev \
-    libossp-uuid-dev \
-    libpng12-dev \
-    libwebp-dev \
-    tomcat8 && \
-  wget -O /tmp/guacd.tar.gz "http://apache.org/dyn/closer.cgi?action=download&filename=incubator/guacamole/0.9.11-incubating/source/guacamole-server-0.9.11-incubating.tar.gz" && \
-  cd /tmp && \
-  tar zxfv /tmp/guacd.tar.gz && \
-  cd guacamole-server-* && \
-  ./configure && \
-  make && \
-  make install && \
-  ldconfig && \
-  mkdir -p /var/cache/tomcat8 && \
-  mkdir -p /var/lib/guacamole/classpath && \
-  mkdir -p /usr/share/tomcat8/.guacamole && \
-  mkdir -p /usr/share/tomcat8-root/.guacamole && \
-  mkdir -p /root/.guacamole && \
-  wget -O /var/lib/tomcat8/webapps/guacamole.war "http://apache.org/dyn/closer.cgi?action=download&filename=incubator/guacamole/0.9.11-incubating/binary/guacamole-0.9.11-incubating.war" && \
-  wget -O /var/lib/guacamole/classpath/guacamole-auth-noauth-0.9.11.jar "http://apache.org/dyn/closer.cgi?action=download&filename=incubator/guacamole/0.9.11-incubating/binary/guacamole-auth-noauth-0.9.11-incubating.tar.gz" && \
-  ln -s /etc/guacamole/guacamole.properties /usr/share/tomcat8/.guacamole/ && \
-  ln -s /etc/guacamole/guacamole.properties /usr/share/tomcat8-root/.guacamole/ && \
-  ln -s /etc/guacamole/guacamole.properties /root/.guacamole/ && \
-  rm -Rf /var/lib/tomcat8/webapps/ROOT && \
-  ln -s /var/lib/tomcat8/webapps/guacamole.war /var/lib/tomcat8/webapps/ROOT.war && \
+  # Install vncpasswd.py
+  mkdir -p /opt/vncpasswd && \
+  curl -L https://github.com/trinitronx/vncpasswd.py/archive/master.tar.gz | tar -zx --strip=1 -C /opt/vncpasswd && \
+
+  # Install noVNC
+  mkdir -p /opt/novnc && \
+  curl -L https://github.com/novnc/noVNC/archive/v0.6.2.tar.gz | tar -zx --strip=1 -C /opt/novnc && \
 
   # Cleanup
-  apt-get remove -y build-essential && \
   apt-get autoremove -y && \
   apt-get clean -y && \
   rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/* /var/cache/*
 
 ADD /files/ /
 
-ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
+EXPOSE 5900 6080
