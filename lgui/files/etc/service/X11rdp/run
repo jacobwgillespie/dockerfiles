@@ -1,0 +1,6 @@
+#!/bin/bash
+exec 2>&1
+WD=${WIDTH:-1280}
+HT=${HEIGHT:-720}
+
+exec /sbin/setuser nobody X11rdp :1 -bs -ac -nolisten tcp -geometry ${WD}x${HT} -depth 16 -uds

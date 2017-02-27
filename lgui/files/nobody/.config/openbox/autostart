@@ -1,0 +1,7 @@
+# Programs that will run after Openbox has started
+
+xsetroot -solid black -cursor_name left_ptr
+if [ -e /startapp.sh ]; then
+    echo "Starting X app..."
+    exec /startapp.sh
+fi

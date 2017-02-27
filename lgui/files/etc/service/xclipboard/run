@@ -1,0 +1,4 @@
+#!/bin/bash
+sv -w7 check openbox
+
+exec env DISPLAY=:1 HOME=/nobody /sbin/setuser nobody xclipboard
