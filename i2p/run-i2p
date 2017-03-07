@@ -13,4 +13,4 @@ usermod -o -u "$PUID" i2psvc
 
 echo "i2psvc user: UID ${PUID} GID ${PGID}"
 
-exec /usr/bin/i2prouter "$@"
+exec su - i2psvc -s /bin/sh -c "/usr/bin/i2prouter $@"

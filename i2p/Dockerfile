@@ -57,6 +57,5 @@ ADD run-i2p /usr/local/bin/run-i2p
 EXPOSE 2827 7650 7654 7655 7656 7657 7658 7659 7660 7661 7662 4444 6668 8998
 
 VOLUME /var/lib/i2p
-USER i2psvc
 ENTRYPOINT ["/usr/local/bin/run-i2p"]
 CMD ["console"]
