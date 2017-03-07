@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [[ $(cat /etc/timezone) != $TZ ]] ; then
+  echo "$TZ" > /etc/timezone
+  dpkg-reconfigure -f noninteractive tzdata
+fi
+
+PUID=${PUID:-911}
+PGID=${PGID:-911}
+
+groupmod -o -g "$PGID" i2psvc
+usermod -o -u "$PUID" i2psvc
+
+echo "i2psvc user: UID ${PUID} GID ${PGID}"
+
+exec /usr/bin/i2prouter "$@"

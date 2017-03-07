@@ -37,6 +37,8 @@ RUN \
   apt-get clean -y && \
   rm -rf /tmp/* /var/tmp/* /var/lib/apt/lists/* /var/cache/* /root/.cache/*
 
+ADD run-i2p /usr/local/bin/run-i2p
+
 ##
 # Expose some ports used by I2P
 # Description at https://geti2p.net/ports
@@ -56,5 +58,5 @@ EXPOSE 2827 7650 7654 7655 7656 7657 7658 7659 7660 7661 7662 4444 6668 8998
 
 VOLUME /var/lib/i2p
 USER i2psvc
-ENTRYPOINT ["/usr/bin/i2prouter"]
+ENTRYPOINT ["/usr/local/bin/run-i2p"]
 CMD ["console"]

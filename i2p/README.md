@@ -8,6 +8,8 @@ Provides the i2p router in a minimal Debian container.
 $ docker create \
   --name i2p \
   --net=host \
+  -e PUID=<UID> -e PGID=<GID> \
+  -e TZ=<timezone> \
   -v </path/to/i2p/config>:/var/lib/i2p \
   jacobwgillespie/i2p
 ```
@@ -17,11 +19,8 @@ $ docker create \
 Variable | Default | Description
 -------- | ------- | -----------
 `TZ` | none | Set this to control the timezone in the container
-`PUID` | none | Set the UID of the container user
-`PGID` | none | Set the GID of the container user
-`VNC_PASSWD` | none | If set, the VNC server will require a password
-`VNC_PORT` | 5900 | Change the VNC server port
-`VNC_RESOLUTION` | `1920x1080` | The display resolution for qBittorrent
+`PUID` | none | Set the UID of the i2p user
+`PGID` | none | Set the GID of the i2p user
 
 ### Ports
 
