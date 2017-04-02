@@ -13,4 +13,8 @@ usermod -o -u "$PUID" i2psvc
 
 echo "i2psvc user: UID ${PUID} GID ${PGID}"
 
+if [ ! -z "$JAVA_MAX_MEMORY" ]; then
+  echo "wrapper.java.maxmemory=$JAVA_MAX_MEMORY" >> /etc/i2p/wrapper.config
+fi
+
 exec su - i2psvc -s /bin/sh -c "/usr/bin/i2prouter $@"
