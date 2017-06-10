@@ -4,6 +4,7 @@ ENV RCLONE_VERSION=current
 ENV ARCH=amd64
 
 RUN apk -U add ca-certificates fuse \
+    && update-ca-certificates \
     && rm -rf /var/cache/apk/* \
     && cd /tmp \
     && wget -q http://downloads.rclone.org/rclone-${RCLONE_VERSION}-linux-${ARCH}.zip \
