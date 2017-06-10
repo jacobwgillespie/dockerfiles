@@ -3,8 +3,7 @@ FROM alpine:3.5
 ENV RCLONE_VERSION=current
 ENV ARCH=amd64
 
-RUN apk -U add ca-certificates fuse \
-    && update-ca-certificates \
+RUN apk -U add ca-certificates fuse openssl \
     && rm -rf /var/cache/apk/* \
     && cd /tmp \
     && wget -q http://downloads.rclone.org/rclone-${RCLONE_VERSION}-linux-${ARCH}.zip \
