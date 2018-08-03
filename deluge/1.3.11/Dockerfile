@@ -1,6 +1,6 @@
 FROM linuxserver/baseimage
 
-RUN add-apt-repository -y ppa:deluge-team/ppa > /dev/null && \
+RUN \
     apt-get update -q && \
     apt-get install -qy \
       python python-twisted python-openssl python-setuptools \
